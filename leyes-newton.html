@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leyes de Newton — Física</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(255,255,255,0.08);
+    --accent: #4f8ef7;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 40px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .header-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-weight: 300;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  .wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  .law-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  @media(max-width:600px){ .law-selector{grid-template-columns:1fr;} }
+
+  .law-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 30px;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    text-align: left;
+    width: 100%;
+  }
+  .law-card:hover { border-color: rgba(79,142,247,0.4); background: var(--surface2); }
+  .law-card.active { border-color: var(--accent); background: var(--surface2); }
+  .law-card.active .law-dot { background: var(--accent); }
+  .law-card:nth-child(2).active { border-color: var(--accent2); }
+  .law-card:nth-child(2).active .law-dot { background: var(--accent2); }
+
+  .law-dot { width:6px; height:6px; border-radius:50%; background:var(--text-muted); margin-bottom:16px; transition:background 0.25s; }
+  .law-num { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+  .law-card h2 { font-family:'DM Serif Display',serif; font-size:1.4rem; font-weight:400; color:var(--text); margin-bottom:10px; }
+  .law-card p { font-size:13px; color:var(--text-muted); line-height:1.6; }
+  .law-formula { margin-top:16px; font-size:18px; color:var(--text-dim); font-weight:500; }
+
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  .panel-header { margin-bottom:32px; padding-bottom:24px; border-bottom:1px solid var(--border); }
+  .panel-header h3 { font-family:'DM Serif Display',serif; font-size:1.6rem; font-weight:400; margin-bottom:6px; }
+  .panel-header p { font-size:14px; color:var(--text-muted); line-height:1.6; }
+
+  .sub-options { display:flex; gap:10px; margin-bottom:36px; flex-wrap:wrap; }
+  .sub-btn {
+    font-size:12px; padding:8px 18px;
+    background:transparent; border:1px solid var(--border);
+    color:var(--text-muted); cursor:pointer;
+    border-radius:100px; font-family:'Inter',sans-serif;
+    transition:all 0.2s; letter-spacing:0.5px;
+  }
+  .sub-btn:hover { border-color:var(--accent); color:var(--text); }
+  .sub-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  #panel-3 .sub-btn.active { background:var(--accent2); border-color:var(--accent2); }
+
+  .calc-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media(max-width:650px){ .calc-grid{grid-template-columns:1fr;} }
+
+  .input-box { background:var(--surface); border:1px solid var(--border); padding:30px; }
+  .enunciado {
+    font-size:13px; color:var(--text-muted); line-height:1.7;
+    margin-bottom:28px; padding:16px;
+    background:rgba(255,255,255,0.02);
+    border-left:2px solid var(--accent);
+  }
+  #panel-3 .enunciado { border-left-color:var(--accent2); }
+
+  .field { margin-bottom:22px; }
+  .field label { display:block; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+  .field input {
+    width:100%; background:rgba(255,255,255,0.04);
+    border:1px solid var(--border); color:var(--text);
+    padding:12px 14px; font-size:15px; font-family:'Inter',sans-serif;
+    outline:none; transition:border-color 0.2s; border-radius:4px;
+  }
+  .field input:focus { border-color:var(--accent); }
+  #panel-3 .field input:focus { border-color:var(--accent2); }
+  .field input::placeholder { color:var(--text-muted); }
+
+  .calc-btn {
+    width:100%; padding:13px;
+    background:var(--accent); border:none; color:#fff;
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:500;
+    letter-spacing:1px; cursor:pointer; border-radius:4px; transition:opacity 0.2s;
+  }
+  .calc-btn:hover { opacity:0.85; }
+  #panel-3 .calc-btn { background:var(--accent2); }
+
+  .result-box {
+    background:var(--surface); border:1px solid var(--border);
+    padding:30px; display:flex; flex-direction:column; gap:20px;
+  }
+  .result-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; }
+  .result-empty { color:var(--text-muted); font-size:14px; line-height:1.7; }
+
+  .steps-list { display:flex; flex-direction:column; gap:8px; }
+  .step { font-size:13px; color:var(--text-dim); display:flex; align-items:flex-start; gap:10px; line-height:1.5; }
+  .step-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); margin-top:6px; flex-shrink:0; }
+  #panel-3 .step-dot { background:var(--accent2); }
+
+  .result-value-wrap {
+    background:rgba(79,142,247,0.06); border:1px solid rgba(79,142,247,0.2);
+    border-radius:4px; padding:20px; text-align:center;
+  }
+  #panel-3 .result-value-wrap { background:rgba(167,139,250,0.06); border-color:rgba(167,139,250,0.2); }
+
+  .result-num {
+    font-family:'DM Serif Display',serif; font-size:2.4rem; font-weight:400;
+    color:var(--accent); line-height:1; margin-bottom:4px;
+  }
+  #panel-3 .result-num { color:var(--accent2); }
+  .result-unit { font-size:12px; color:var(--text-muted); letter-spacing:1px; }
+
+  .error-msg { color:#f87171; font-size:13px; padding:12px; background:rgba(248,113,113,0.06); border-radius:4px; }
+
+  canvas {
+    width:100%; height:180px; display:block;
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--border); border-radius:4px;
+  }
+  .canvas-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+
+  .theory-strip {
+    margin-top:48px; padding-top:32px; border-top:1px solid var(--border);
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px;
+  }
+  .t-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+  .t-title { font-size:14px; font-weight:500; color:var(--text); margin-bottom:6px; }
+  .t-body { font-size:13px; color:var(--text-muted); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="breadcrumb">Física Fundamental · Proyecto</div>
+  <h1>Leyes de Newton</h1>
+  <p class="header-desc">Selecciona una ley, ingresa tus valores y obtén el resultado paso a paso con animación visual.</p>
+</header>
+
+<div class="wrapper">
+
+  <div class="law-selector">
+    <button class="law-card active" onclick="selectLaw(2)">
+      <div class="law-dot"></div>
+      <div class="law-num">Segunda Ley</div>
+      <h2>Fuerza y Movimiento</h2>
+      <p>Relaciona la fuerza aplicada, la masa del objeto y la aceleración resultante.</p>
+      <div class="law-formula">F = m · a</div>
+    </button>
+    <button class="law-card" onclick="selectLaw(3)">
+      <div class="law-dot"></div>
+      <div class="law-num">Tercera Ley</div>
+      <h2>Acción y Reacción</h2>
+      <p>Toda fuerza de acción produce una fuerza de reacción igual en magnitud y dirección opuesta.</p>
+      <div class="law-formula">F₁₂ = −F₂₁</div>
+    </button>
+  </div>
+
+  <!-- 2da Ley -->
+  <div class="panel active" id="panel-2">
+    <div class="panel-header">
+      <h3>Segunda Ley de Newton</h3>
+      <p>Elige qué variable deseas calcular. Completa los campos con los valores conocidos.</p>
+    </div>
+    <div class="sub-options">
+      <button class="sub-btn active" onclick="setMode2(0,this)">Calcular Fuerza (F)</button>
+      <button class="sub-btn" onclick="setMode2(1,this)">Calcular Aceleración (a)</button>
+      <button class="sub-btn" onclick="setMode2(2,this)">Calcular Masa (m)</button>
+    </div>
+    <div class="calc-grid">
+      <div class="input-box">
+        <div class="enunciado" id="e2"></div>
+        <div id="fields2"></div>
+        <button class="calc-btn" onclick="calc2()">Calcular resultado</button>
+      </div>
+      <div class="result-box">
+        <div>
+          <div class="result-label">Procedimiento</div>
+          <div id="steps2" class="result-empty">Los pasos aparecerán aquí una vez que calcules.</div>
+        </div>
+        <div id="val2" style="display:none">
+          <div class="result-value-wrap">
+            <div class="result-num" id="rnum2">—</div>
+            <div class="result-unit" id="runit2"></div>
+          </div>
+        </div>
+        <div>
+          <div class="canvas-label">Visualización</div>
+          <canvas id="canvas2"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="theory-strip">
+      <div><div class="t-label">Fórmula</div><div class="t-title">F = m · a</div><div class="t-body">La fuerza neta es igual al producto de la masa por la aceleración del objeto.</div></div>
+      <div><div class="t-label">Unidades</div><div class="t-title">Newton [N]</div><div class="t-body">1 Newton = 1 kg·m/s². La masa en kg, la aceleración en m/s².</div></div>
+      <div><div class="t-label">Ejemplo</div><div class="t-title">Auto en movimiento</div><div class="t-body">Un auto de 1200 kg con a = 3 m/s² requiere F = 3600 N del motor.</div></div>
+    </div>
+  </div>
+
+  <!-- 3ra Ley -->
+  <div class="panel" id="panel-3">
+    <div class="panel-header">
+      <h3>Tercera Ley de Newton</h3>
+      <p>Elige el tipo de situación. Ingresa los valores y verifica el par acción-reacción.</p>
+    </div>
+    <div class="sub-options">
+      <button class="sub-btn active" onclick="setMode3(0,this)">Par acción-reacción</button>
+      <button class="sub-btn" onclick="setMode3(1,this)">Aceleraciones del sistema</button>
+      <button class="sub-btn" onclick="setMode3(2,this)">Fuerza Normal</button>
+    </div>
+    <div class="calc-grid">
+      <div class="input-box">
+        <div class="enunciado" id="e3"></div>
+        <div id="fields3"></div>
+        <button class="calc-btn" onclick="calc3()">Calcular resultado</button>
+      </div>
+      <div class="result-box">
+        <div>
+          <div class="result-label">Procedimiento</div>
+          <div id="steps3" class="result-empty">Los pasos aparecerán aquí una vez que calcules.</div>
+        </div>
+        <div id="val3" style="display:none">
+          <div class="result-value-wrap">
+            <div class="result-num" id="rnum3">—</div>
+            <div class="result-unit" id="runit3"></div>
+          </div>
+        </div>
+        <div>
+          <div class="canvas-label">Visualización</div>
+          <canvas id="canvas3"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="theory-strip">
+      <div><div class="t-label">Principio</div><div class="t-title">F₁₂ = −F₂₁</div><div class="t-body">Acción y reacción son iguales en magnitud y opuestas en dirección.</div></div>
+      <div><div class="t-label">Importante</div><div class="t-title">No se cancelan</div><div class="t-body">Las fuerzas actúan sobre cuerpos distintos, por eso no se anulan.</div></div>
+      <div><div class="t-label">Ejemplo</div><div class="t-title">Cohete espacial</div><div class="t-body">Expulsa gas hacia atrás (acción) y avanza hacia adelante (reacción).</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let law=2, mode2=0, mode3=0, animId2=null, animId3=null;
+
+const modes2=[
+  {
+    enunciado:'Introduce la masa del objeto y su aceleración. Se calculará la fuerza neta usando F = m × a.',
+    fields:[{id:'m',label:'Masa (kg)',ph:'ej: 10'},{id:'a',label:'Aceleración (m/s²)',ph:'ej: 5'}],
+    calc(v){const m=+v.m,a=+v.a;if(!m||isNaN(a)||v.m===''||v.a==='')return null;return{val:m*a,unit:'Newtons (N)',steps:[`Masa m = ${m} kg`,`Aceleración a = ${a} m/s²`,`Aplicando F = m × a`,`F = ${m} × ${a}`,`F = ${(m*a).toFixed(4)} N`],anim:{m,a,f:m*a}};}
+  },
+  {
+    enunciado:'Introduce la fuerza aplicada y la masa del objeto. Se calculará la aceleración resultante usando a = F / m.',
+    fields:[{id:'f',label:'Fuerza (N)',ph:'ej: 50'},{id:'m',label:'Masa (kg)',ph:'ej: 10'}],
+    calc(v){const f=+v.f,m=+v.m;if(!m||!f||v.f===''||v.m==='')return null;return{val:f/m,unit:'m/s²',steps:[`Fuerza F = ${f} N`,`Masa m = ${m} kg`,`Despejando a = F / m`,`a = ${f} / ${m}`,`a = ${(f/m).toFixed(4)} m/s²`],anim:{m,a:f/m,f}};}
+  },
+  {
+    enunciado:'Introduce la fuerza aplicada y la aceleración producida. Se calculará la masa del objeto usando m = F / a.',
+    fields:[{id:'f',label:'Fuerza (N)',ph:'ej: 50'},{id:'a',label:'Aceleración (m/s²)',ph:'ej: 5'}],
+    calc(v){const f=+v.f,a=+v.a;if(!f||!a||v.f===''||v.a==='')return null;return{val:f/a,unit:'kilogramos (kg)',steps:[`Fuerza F = ${f} N`,`Aceleración a = ${a} m/s²`,`Despejando m = F / a`,`m = ${f} / ${a}`,`m = ${(f/a).toFixed(4)} kg`],anim:{m:f/a,a,f}};}
+  }
+];
+
+const modes3=[
+  {
+    enunciado:'Introduce la fuerza que ejerce el Cuerpo A sobre el Cuerpo B. Por la 3ra Ley, la reacción tiene exactamente la misma magnitud y sentido opuesto.',
+    fields:[{id:'f',label:'Fuerza de acción (N)',ph:'ej: 80'}],
+    calc(v){const f=+v.f;if(!f||v.f==='')return null;return{val:f,unit:'N — reacción igual y opuesta',steps:[`Fuerza de acción (A→B) = ${f} N`,`Por la 3ra Ley: F_reacción = ${f} N`,`Dirección opuesta a la acción`,`Ambas fuerzas actúan en cuerpos distintos`],anim:{f,type:'pair'}};}
+  },
+  {
+    enunciado:'Introduce la fuerza mutua entre los cuerpos y sus masas. Se calcularán las aceleraciones individuales de cada cuerpo.',
+    fields:[{id:'f',label:'Fuerza mutua (N)',ph:'ej: 120'},{id:'mA',label:'Masa cuerpo A (kg)',ph:'ej: 60'},{id:'mB',label:'Masa cuerpo B (kg)',ph:'ej: 80'}],
+    calc(v){const f=+v.f,mA=+v.mA,mB=+v.mB;if(!f||!mA||!mB)return null;const aA=f/mA,aB=f/mB;return{val:aA,unit:`m/s² (A)   ·   ${aB.toFixed(4)} m/s² (B)`,steps:[`Fuerza = ${f} N (igual para ambos, 3ra Ley)`,`a_A = F / m_A = ${f} / ${mA} = ${aA.toFixed(4)} m/s²`,`a_B = F / m_B = ${f} / ${mB} = ${aB.toFixed(4)} m/s²`,`Mayor masa → menor aceleración`],anim:{f,mA,mB,aA,aB,type:'accel'}};}
+  },
+  {
+    enunciado:'Introduce la masa del objeto y el valor de la gravedad. El piso ejerce una Fuerza Normal igual al peso del objeto, hacia arriba.',
+    fields:[{id:'m',label:'Masa del objeto (kg)',ph:'ej: 25'},{id:'g',label:'Gravedad (m/s²)',ph:'9.8'}],
+    calc(v){const m=+v.m,g=v.g===''?9.8:+v.g;if(!m)return null;const w=m*g;return{val:w,unit:'N — Fuerza Normal = Peso',steps:[`Masa m = ${m} kg`,`Gravedad g = ${g} m/s²`,`Peso W = m × g = ${m} × ${g} = ${w.toFixed(4)} N`,`Fuerza Normal = ${w.toFixed(4)} N (hacia arriba)`,`W y N forman el par acción-reacción`],anim:{f:w,type:'surface',m,g}};}
+  }
+];
+
+function selectLaw(n){
+  law=n;
+  document.querySelectorAll('.law-card').forEach((c,i)=>c.classList.toggle('active',i===n-2));
+  document.getElementById('panel-2').classList.toggle('active',n===2);
+  document.getElementById('panel-3').classList.toggle('active',n===3);
+}
+
+function setMode2(i,btn){ mode2=i; document.querySelectorAll('#panel-2 .sub-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderFields2(); clearResult2(); }
+function setMode3(i,btn){ mode3=i; document.querySelectorAll('#panel-3 .sub-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderFields3(); clearResult3(); }
+
+function renderFields2(){ const m=modes2[mode2]; document.getElementById('e2').textContent=m.enunciado; document.getElementById('fields2').innerHTML=m.fields.map(f=>`<div class="field"><label>${f.label}</label><input type="number" id="f2-${f.id}" placeholder="${f.ph}" step="any"></div>`).join(''); }
+function renderFields3(){ const m=modes3[mode3]; document.getElementById('e3').textContent=m.enunciado; document.getElementById('fields3').innerHTML=m.fields.map(f=>`<div class="field"><label>${f.label}</label><input type="number" id="f3-${f.id}" placeholder="${f.ph}" step="any"></div>`).join(''); }
+
+function clearResult2(){ document.getElementById('steps2').innerHTML='<span style="color:var(--text-muted)">Los pasos aparecerán aquí una vez que calcules.</span>'; document.getElementById('val2').style.display='none'; stop(2); clearCanvas('canvas2'); }
+function clearResult3(){ document.getElementById('steps3').innerHTML='<span style="color:var(--text-muted)">Los pasos aparecerán aquí una vez que calcules.</span>'; document.getElementById('val3').style.display='none'; stop(3); clearCanvas('canvas3'); }
+function stop(n){ if(n===2&&animId2){cancelAnimationFrame(animId2);animId2=null;} if(n===3&&animId3){cancelAnimationFrame(animId3);animId3=null;} }
+function clearCanvas(id){ const c=document.getElementById(id); c.width=c.offsetWidth; c.height=180; }
+
+function getVals(prefix, fields){ const v={}; fields.forEach(f=>{ const el=document.getElementById(prefix+f.id); v[f.id]=el?el.value:''; }); return v; }
+
+function calc2(){ const m=modes2[mode2]; const v=getVals('f2-',m.fields); const res=m.calc(v); if(!res){ document.getElementById('steps2').innerHTML='<div class="error-msg">Verifica los valores ingresados. No dejes campos vacíos.</div>'; document.getElementById('val2').style.display='none'; return; } showResult(2,res); }
+function calc3(){ const m=modes3[mode3]; const v=getVals('f3-',m.fields); const res=m.calc(v); if(!res){ document.getElementById('steps3').innerHTML='<div class="error-msg">Verifica los valores ingresados. No dejes campos vacíos.</div>'; document.getElementById('val3').style.display='none'; return; } showResult(3,res); }
+
+function showResult(n,res){
+  document.getElementById(`steps${n}`).innerHTML='<div class="steps-list">'+res.steps.map(s=>`<div class="step"><div class="step-dot"></div><span>${s}</span></div>`).join('')+'</div>';
+  document.getElementById(`rnum${n}`).textContent=parseFloat(res.val.toFixed(4)).toLocaleString('es');
+  document.getElementById(`runit${n}`).textContent=res.unit;
+  document.getElementById(`val${n}`).style.display='block';
+  stop(n);
+  if(n===2) anim2(res.anim); else anim3(res.anim);
+}
+
+function anim2(d){
+  const cv=document.getElementById('canvas2');
+  cv.width=cv.offsetWidth; cv.height=180;
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Ground
+    ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,H*0.7); ctx.lineTo(W,H*0.7); ctx.stroke();
+    // Block position
+    const prog=(Math.sin(t)*0.5+0.5);
+    const bX=24+prog*(W-108), bW=60, bH=42, bY=H*0.7-bH;
+    // Shadow
+    ctx.fillStyle='rgba(79,142,247,0.07)';
+    ctx.beginPath(); ctx.ellipse(bX+bW/2,H*0.7+3,bW*0.38,5,0,0,Math.PI*2); ctx.fill();
+    // Block
+    ctx.fillStyle='rgba(79,142,247,0.13)';
+    ctx.strokeStyle='rgba(79,142,247,0.65)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(bX,bY,bW,bH,3); ctx.fill(); ctx.stroke();
+    // Label
+    ctx.fillStyle='rgba(226,232,240,0.7)'; ctx.font='500 11px Inter,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(`${parseFloat(d.m.toFixed(2))} kg`,bX+bW/2,bY+bH/2+4);
+    // Arrow
+    const vel=Math.cos(t); const dir=vel>=0?1:-1;
+    const ax=dir>0?bX+bW:bX; const alen=Math.max(0,32*Math.abs(vel));
+    if(alen>2){
+      ctx.strokeStyle='rgba(79,142,247,0.85)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(ax,bY+bH/2); ctx.lineTo(ax+dir*alen,bY+bH/2); ctx.stroke();
+      ctx.fillStyle='rgba(79,142,247,0.85)';
+      ctx.beginPath(); ctx.moveTo(ax+dir*alen,bY+bH/2-5); ctx.lineTo(ax+dir*(alen+9),bY+bH/2); ctx.lineTo(ax+dir*alen,bY+bH/2+5); ctx.fill();
+    }
+    // Bottom labels
+    ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Inter,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(`F = ${parseFloat(d.f.toFixed(2))} N`,12,H-10);
+    ctx.textAlign='right';
+    ctx.fillText(`a = ${parseFloat(d.a.toFixed(2))} m/s²`,W-12,H-10);
+    t+=0.022; animId2=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function anim3(d){
+  const cv=document.getElementById('canvas3');
+  cv.width=cv.offsetWidth; cv.height=180;
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2, cy=H/2;
+    if(d.type==='surface'){
+      const bW=60,bH=44,bX=cx-bW/2,bY=cy-bH/2+6;
+      // Surface
+      ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,bY+bH,W,H-(bY+bH));
+      ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,bY+bH); ctx.lineTo(W,bY+bH); ctx.stroke();
+      // Block
+      ctx.fillStyle='rgba(167,139,250,0.11)'; ctx.strokeStyle='rgba(167,139,250,0.65)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.roundRect(bX,bY,bW,bH,3); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='rgba(226,232,240,0.6)'; ctx.font='11px Inter'; ctx.textAlign='center';
+      ctx.fillText(`${d.m} kg`,cx,cy+10);
+      const p=0.65+0.35*Math.sin(t*2.5);
+      const al=26*p;
+      // Weight ↓
+      ctx.strokeStyle=`rgba(167,139,250,${p*0.9})`; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx,bY+bH); ctx.lineTo(cx,bY+bH+al); ctx.stroke();
+      ctx.fillStyle=`rgba(167,139,250,${p*0.9})`;
+      ctx.beginPath(); ctx.moveTo(cx-4,bY+bH+al); ctx.lineTo(cx,bY+bH+al+8); ctx.lineTo(cx+4,bY+bH+al); ctx.fill();
+      // Normal ↑
+      ctx.strokeStyle=`rgba(52,211,153,${p*0.9})`; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx,bY); ctx.lineTo(cx,bY-al); ctx.stroke();
+      ctx.fillStyle=`rgba(52,211,153,${p*0.9})`;
+      ctx.beginPath(); ctx.moveTo(cx-4,bY-al); ctx.lineTo(cx,bY-al-8); ctx.lineTo(cx+4,bY-al); ctx.fill();
+      ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Inter'; ctx.textAlign='left';
+      ctx.fillText(`Peso: ${parseFloat(d.f.toFixed(1))} N ↓`,10,H-26);
+      ctx.fillText(`Normal: ${parseFloat(d.f.toFixed(1))} N ↑`,10,H-10);
+    } else {
+      const sep=52+Math.sin(t*1.8)*7;
+      // A
+      const aW=52,aH=40,aX=cx-sep-aW,aY=cy-aH/2;
+      ctx.fillStyle='rgba(79,142,247,0.11)'; ctx.strokeStyle='rgba(79,142,247,0.65)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.roundRect(aX,aY,aW,aH,3); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='rgba(226,232,240,0.6)'; ctx.font='500 11px Inter'; ctx.textAlign='center';
+      ctx.fillText('A',aX+aW/2,cy+4);
+      if(d.mA){ctx.fillStyle='rgba(148,163,184,0.35)'; ctx.font='10px Inter'; ctx.fillText(`${d.mA} kg`,aX+aW/2,aY-6);}
+      // B
+      const bW=52,bH=40,bX=cx+sep,bY=cy-bH/2;
+      ctx.fillStyle='rgba(167,139,250,0.11)'; ctx.strokeStyle='rgba(167,139,250,0.65)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.roundRect(bX,bY,bW,bH,3); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='rgba(226,232,240,0.6)'; ctx.font='500 11px Inter'; ctx.textAlign='center';
+      ctx.fillText('B',bX+bW/2,cy+4);
+      if(d.mB){ctx.fillStyle='rgba(148,163,184,0.35)'; ctx.font='10px Inter'; ctx.fillText(`${d.mB} kg`,bX+bW/2,bY-6);}
+      // Arrow A→B
+      const x1=aX+aW, x2=bX;
+      ctx.strokeStyle='rgba(79,142,247,0.8)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x1,cy-9); ctx.lineTo(x2-9,cy-9); ctx.stroke();
+      ctx.fillStyle='rgba(79,142,247,0.8)';
+      ctx.beginPath(); ctx.moveTo(x2-9,cy-14); ctx.lineTo(x2,cy-9); ctx.lineTo(x2-9,cy-4); ctx.fill();
+      // Arrow B→A
+      ctx.strokeStyle='rgba(167,139,250,0.8)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x2,cy+9); ctx.lineTo(x1+9,cy+9); ctx.stroke();
+      ctx.fillStyle='rgba(167,139,250,0.8)';
+      ctx.beginPath(); ctx.moveTo(x1+9,cy+4); ctx.lineTo(x1,cy+9); ctx.lineTo(x1+9,cy+14); ctx.fill();
+      ctx.fillStyle='rgba(148,163,184,0.45)'; ctx.font='11px Inter'; ctx.textAlign='center';
+      ctx.fillText(`${parseFloat(d.f.toFixed(1))} N`,cx,cy-16);
+      ctx.fillText(`${parseFloat(d.f.toFixed(1))} N`,cx,cy+24);
+    }
+    t+=0.02; animId3=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+renderFields2(); renderFields3();
+</script>
+</body>
+</html>
